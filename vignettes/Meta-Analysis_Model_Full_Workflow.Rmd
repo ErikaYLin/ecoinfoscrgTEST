@@ -32,7 +32,7 @@ To work with spatial data for this meta-analysis model, the `sf` and `ecoinfoscr
 # install.packages("dplyr")
 # install.packages("ggplot2")
 # install.packages("devtools")  # if `devtools` was not previously installed
-# devtools::install_github("https://github.com/ecoinformatic/SCRG/tree/main/ecoinfoscrg")
+# devtools::install_github("https://github.com/ErikaYLin/ecoinfoscrgTEST/")
 
 # Load ecoinfoscrg
 library(ecoinfoscrgTEST)
@@ -56,7 +56,7 @@ The `cleaningWrangling()` function automates the process of cleaning and combini
 
 <!--The specific code for certain scripts can be found in the "additions" branch of the repository.-->
 
-```{r cleaning, eval = FALSE}
+```{r cleaning}
 
 ## Import shape file data
 # Choctawatchee Bay data (transformed 0.001deg.shp from WGS 84 to 6346 17N )
@@ -126,7 +126,7 @@ Datasets may have missing values for certain predictor variables. For numerical 
 
 Here, we have chosen to use auto-Kriging to estimate missing values for site-wide numeric predictors where possible, and the remaining numeric predictors will be imputed with the state-wide mean values. We will also standardize our data to be centered on 0 with a standard deviation of 1, so that values are comparable across sites and variables. The mean and standard deviation used for standardization for each variable is saved to ensure that the standardization process is consistent.
 
-```{r standard, eval = FALSE}
+```{r standard, results = 'hide'}
 
 # Impute and standardize the data
 data <- standardize(data = data, site.method = "krige", state.method = "meanImpute")
@@ -147,7 +147,7 @@ load("data/data_standardize_impute.rda")  # imports the named "data" object
 
 ```
 
-```{r standard3, echo = FALSE, eval = FALSE}
+```{r standard3, echo = FALSE}
 
 load("../Data/data_standardize_impute.rda")
 
@@ -160,7 +160,7 @@ Model selection is done by the `BUPD.R` and BUPD_nonparallel.R` scripts. These s
 
 Model selection via BUPD is done for each study separately, before combining the results into a meta-analysis model that will enable comparable predictions of living shoreline suitability along the entire Florida coastline. The process returns the final selected model (lowest AIC) for each site, as well as the model formula, odds ratios, and beta coefficient estimates, and the run time for the process.
 
-```{r model_selection, eval = FALSE}
+```{r model_selection}
 
 # Retrieve predictor data
 pred <- data$predictors  
@@ -176,11 +176,17 @@ factor_pred <- pred %>%
 pred <- cbind(factor_pred, numeric_pred)
 predictors <- colnames(pred)
 
+```
+
+```{r model_selection1}
+
 # Model selection for all 4 studies
 results <- BUPD(data = data, predictors = predictors, 
                 parallel = FALSE)  # TRUE for faster run time if using Linux/Mac
 
-str(results)  # inspect the results
+```
+
+```{r BUPD, eval = FALSE}
 
 # Once again, we will save the results as this process can be long
 save(results, file = "data/BUPD_results.rda")  # file path
@@ -188,11 +194,14 @@ save(results, file = "data/BUPD_results.rda")  # file path
 # Load saved data
 load("data/BUPD_results.rda")  # imports the named "results" object
 
+str(results)  # inspect the results
+
 ```
 
-```{r model_selection2, echo = FALSE, eval = FALSE}
+```{r model_selection2, echo = FALSE}
 
 load("../Data/BUPD_results.rda")
+str(results)  # inspect the results
 
 ```
 
@@ -202,7 +211,7 @@ load("../Data/BUPD_results.rda")
 
 The `varCov()` function is used to organize and clean the model results for studies that are to be used in the meta-analysis model. This calls the `getBetas()` function that retrieves the beta coefficient estimates and their standard deviations, combining all the information across studies. `getBetas()` can also be used separately for coefficient retrieval from the ordinal probit regression models, however, we recommend running only `varCov()` to streamline the process.
 
-```{r varCov, eval = FALSE}
+```{r varCov}
 
 # Retrieve selected models and assign to list
 mods <- list(results[[1]]$final_model,  # 1st study (Choctawatchee)
@@ -217,7 +226,10 @@ Betas <- list(results[[1]]$coefs,  # 1st study (Choctawatchee)
               results[[4]]$coefs)  # 4th study (IRL)
 
 # Retrieve betas and variance-covariance matrices for betas
-VARCOV <- varCov(data = data, mods = mods, Betas = Betas)
+VARCOV <- varCov(data = data, 
+                 predictors = predictors,
+                 mods = mods, 
+                 Betas = Betas)
 
 ```
 
@@ -225,10 +237,10 @@ VARCOV <- varCov(data = data, mods = mods, Betas = Betas)
 
 The meta-analytic regression model can be updated with new data from Living Shoreline suitability assessments at local sites. This would better inform the model of the relationships between different factors and restoration suitability, which would be particularly useful for comparing suitability between different sites and studies in a standardized fashion, or for obtaining a continuous measure of the probability of success at each site (as opposed to categorized recommendations).
 
-```{r meta_regression, eval = FALSE}
+```{r meta_regression}
 
 # Build meta-analysis model
-meta_analysis <- meta.regression(data = data, varCov = VARCOV)
+meta_analysis <- meta_regression(data = data, varCov = VARCOV)
 
 ```
 
@@ -238,10 +250,10 @@ meta_analysis <- meta.regression(data = data, varCov = VARCOV)
 
 The `predict.meta()` function can be used to predict the suitability of a site for Living Shoreline restoration based on the model produced with `meta_regression()`. This requires the input of the meta-analysis model, updated with data from the sites for which suitability predictions will be made. Suitability for Living Shoreline restoration is represented as a probability for each location point, ranging 0-1 (0-100%). If no data is available, the `predict.rma()` function from the `metafor` package can help retrieve the state-wide average suitability from the model average (see "Predicting from the base state-wide model").
 
-```{r predict, eval = FALSE}
+```{r predict}
 
 # Predict from updated model
-predictions <- ecoinfoscrg::predict(data = data, meta_regression = meta_analysis)
+predictions <- predict.meta_regression(data = data, meta_regression = meta_analysis)
 
 # Add predictions to full predictor data set
 pred$study <- data$state$study  # add studies back to predictors
@@ -251,7 +263,7 @@ pred$predictions <- predictions[,1]
 
 Now, we can map these predictions to get a better picture of suitable locations. Remember the shapefile data we loaded at the beginning? The "geometry" column will come in handy for transforming our data into spatial features, so that we can plot our predictions on a map of the study site.
 
-```{r mapping, eval = FALSE}
+```{r mapping}
 
 # Set the basemap to ESRI World Imagery
 basemaps::set_defaults(map_service = "esri", map_type = "world_imagery")
@@ -282,7 +294,7 @@ plot_choc <- cbind(plot_choc, choc_coords)  # append to predictors
 choc_map <- basemaps::basemap_ggplot(ext = choc_bb) +  # extent = bounding box
   geom_sf(data = plot_choc, aes(x = X, y = Y, color = predictions), size = 0.25) +
   labs(x = "Latitude", y = "Longitude", title = "Choctawatchee Bay") +
-  scale_color_gradient2(name = "Suitability", midpoint = 0.5,
+  scale_color_gradient2(name = "Suitability", midpoint = 0.5, limits = c(0,1),
                         low = "#B31B1B", mid = "#FCF75E", high = "#0BDA51") +
   theme(plot.background = element_blank(),
         panel.background = element_blank(),
@@ -292,9 +304,9 @@ choc_map
 
 ```
 
-![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/choc_predicted_map.png)
+<!-- ![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/choc_predicted_map.png) -->
 
-```{r mapping2, eval = FALSE}
+```{r mapping2}
 
 ## Pensacola Bay
 # Subset full data set to Pensacola only
@@ -322,7 +334,7 @@ plot_pens <- cbind(plot_pens, pens_coords)  # append to predictors
 pens_map <- basemaps::basemap_ggplot(ext = pens_bb) +  # extent = bounding box
   geom_sf(data = plot_pens, aes(x = X, y = Y, color = predictions), size = 0.25) +
   labs(x = "Latitude", y = "Longitude", title = "Pensacola Bay") +
-  scale_color_gradient2(name = "Suitability", midpoint = 0.5,
+  scale_color_gradient2(name = "Suitability", midpoint = 0.5, limits = c(0,1),
                         low = "#B31B1B", mid = "#FCF75E", high = "#0BDA51") +
   theme(plot.background = element_blank(),
         panel.background = element_blank(),
@@ -332,9 +344,9 @@ pens_map
 
 ```
 
-![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/pens_predicted_map.png)
+<!-- ![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/pens_predicted_map.png) -->
 
-```{r mapping3, eval = FALSE}
+```{r mapping3}
 
 ## Tampa Bay
 # Subset full data set to Tampa only
@@ -362,7 +374,7 @@ plot_tampa <- cbind(plot_tampa, tampa_coords)  # append to predictors
 tampa_map <- basemaps::basemap_ggplot(ext = tampa_bb) +  # extent = bounding box
   geom_sf(data = plot_tampa, aes(x = X, y = Y, color = predictions), size = 0.25) +
   labs(x = "Latitude", y = "Longitude", title = "Tampa Bay") +
-  scale_color_gradient2(name = "Suitability", midpoint = 0.5,
+  scale_color_gradient2(name = "Suitability", midpoint = 0.5, limits = c(0,1),
                         low = "#B31B1B", mid = "#FCF75E", high = "#0BDA51") +
   theme(plot.background = element_blank(),
         panel.background = element_blank(),
@@ -372,9 +384,9 @@ tampa_map
 
 ```
 
-![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/tampa_predicted_map.png)
+<!-- ![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/tampa_predicted_map.png) -->
 
-```{r mapping4, eval = FALSE}
+```{r mapping4}
 
 ## Indian River Lagoon
 # Subset full data set to IRL only
@@ -402,7 +414,7 @@ plot_IRL <- cbind(plot_IRL, IRL_coords)  # append to predictors
 IRL_map <- basemaps::basemap_ggplot(ext = IRL_bb) +  # extent = bounding box
   geom_sf(data = plot_IRL, aes(x = X, y = Y, color = predictions), size = 0.25) +
   labs(x = "Latitude", y = "Longitude", title = "Indian River Lagoon") +
-  scale_color_gradient2(name = "Suitability", midpoint = 0.5,
+  scale_color_gradient2(name = "Suitability", midpoint = 0.5, limits = c(0,1),
                         low = "#B31B1B", mid = "#FCF75E", high = "#0BDA51") +
   theme(plot.background = element_blank(),
         panel.background = element_blank(),
@@ -412,13 +424,13 @@ IRL_map
 
 ```
 
-![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/IRL_predicted_map.png)
+<!-- ![](C:/Users/erika/OneDrive - University of Central Florida/R/SCRG-additions/SCRG/ecoinfoscrg/inst/scripts/maps/IRL_predicted_map.png) -->
 
 ### Predicting from the base state-wide model
 
 Currently, predictions at locations outside of the studies used to build the base meta-analysis model will return the model average as there is no information present for such sites. However, we intend to add state-wide geospatial data, such as bathymetry, to better inform the model at the state-wide scale. We will be updating the model, package, and predictions to reflect this.
 
-```{r predict2, eval = FALSE}
+```{r predict2}
 
 # Use `predict.rma` from the `metafor` package
 statewide_avg <- predict(meta_analysis)
