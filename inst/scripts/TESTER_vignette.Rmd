@@ -28,7 +28,7 @@ To work with spatial data for this meta-analysis model, the `sf` and `ecoinfoscr
 devtools::install_github("https://github.com/ErikaYLin/ecoinfoscrgTEST/")
 
 # Load ecoinfoscrg
-library(ecoinfoscrg)
+library(ecoinfoscrgTEST)
 
 # Load other requisite packages
 sf::sf_use_s2(FALSE)  # for working with planar data

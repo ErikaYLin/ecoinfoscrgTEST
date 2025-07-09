@@ -1,7 +1,7 @@
 ---
 title: "Living Shoreline Meta-Analysis Model Full Workflow"
 author: "George Zaragoza, Erika Y. Lin, Christen H. Fleming"
-package: "ecoinfoscrg"
+package: "ecoinfoscrgTEST"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Living Shoreline Meta-Analysis Model Full Workflow}
@@ -35,7 +35,7 @@ To work with spatial data for this meta-analysis model, the `sf` and `ecoinfoscr
 # devtools::install_github("https://github.com/ecoinformatic/SCRG/tree/main/ecoinfoscrg")
 
 # Load ecoinfoscrg
-library(ecoinfoscrg)
+library(ecoinfoscrgTEST)
 
 # Load other requisite packages
 sf::sf_use_s2(FALSE)  # for working with planar data
