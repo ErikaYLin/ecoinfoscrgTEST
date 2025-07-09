@@ -49,20 +49,24 @@ The `cleaningWrangling()` function automates the process of cleaning and combini
 
 <!--The specific code for certain scripts can be found in the "additions" branch of the repository.-->
 
-```{r cleaning, eval = FALSE}
+```{r cleaning}
 
 ## Import shape file data
 # Choctawatchee Bay data (transformed 0.001deg.shp from WGS 84 to 6346 17N )
 choc <- st_read("../Data/choctawatchee_bay/choctawatchee_bay_lssm_POINTS_0.001deg.shp")
+choc <- choc[1:300,]
 
 # Pensacola Bay data (transformed 0.001deg.shp from WGS 84 to 6346 17N )
 pens <- st_read("../Data/santa_rosa_bay/Santa_Rosa_Bay_Living_Shoreline_POINTS_0.001deg.shp")
+pens <- pens[1:300,]
 
 # Tampa Bay data (transformed 0.001deg.shp from WGS 84 to 6346 17N )
 tampa <- st_read("../Data/tampa_bay/Tampa_Bay_Living_Shoreline_Suitability_Model_Results_POINTS_0.001deg.shp")
+tampa <- tampa[1:300,]
 
 # Indian River Lagoon data (transformed 0.001deg.shp from WGS 84 to 6346 17N )
 IRL <- st_read("../Data/indian_river_lagoon/UCF_livingshorelinemodels_MosquitoNorthIRL_111m.shp")
+IRL <- IRL[1:300,]
 
 ## Note that the response variable for IRL does not follow the same evaluation
 ## convention as the other LSSMs
@@ -101,7 +105,7 @@ for (var in c(categorical_vars, binary_vars)) {
 }
 
 # Fix unique cases of misspellings
-pred$Adj_H2[44059] <- "V"  # original spelling had an extra comma
+# pred$Adj_H2[44059] <- "V"  # original spelling had an extra comma
 
 # For binary variables not entered as Yes/No or Y/N or 1/0, change to 1/0
 pred$canal <- gsub("Canal", "1", pred$canal)
@@ -119,7 +123,7 @@ Datasets may have missing values for certain predictor variables. For numerical 
 
 Here, we have chosen to use auto-Kriging to estimate missing values for site-wide numeric predictors where possible, and the remaining numeric predictors will be imputed with the state-wide mean values. We will also standardize our data to be centered on 0 with a standard deviation of 1, so that values are comparable across sites and variables. The mean and standard deviation used for standardization for each variable is saved to ensure that the standardization process is consistent.
 
-```{r standard, eval = FALSE}
+```{r standard}
 
 # Impute and standardize the data
 data <- standardize(data = data, site.method = "krige", state.method = "meanImpute")
@@ -131,18 +135,18 @@ If Kriging (recommended), this process can take time. We can save the output as 
 ```{r standard2, eval = FALSE}
 
 # Save processed data for faster loading
-save(data, file = "data/data_standardize_impute.rda")  # file path
-# saveRDS(data, file = "data/data_standardize_impute.rds")  # RDS example
+save(data, file = "data/data_subset_standardize_impute.rda")  # file path
+# saveRDS(data, file = "data/data_subset_standardize_impute.rds")  # RDS example
 
 # Load saved data
-load("data/data_standardize_impute.rda")  # imports the named "data" object
-# newdata <- readRDS("data/data_standardize_impute.rda")  # importing and renaming RDS
+load("data/data_subset_standardize_impute.rda")  # imports the named "data" object
+# newdata <- readRDS("data/data_subset_standardize_impute.rda")  # importing and renaming RDS
 
 ```
 
-```{r standard3, echo = FALSE, eval = FALSE}
+```{r standard3, echo = FALSE}
 
-load("../Data/data_standardize_impute.rda")
+load("../Data/data_subset_standardize_impute.rda")
 
 ```
 
@@ -153,7 +157,7 @@ Model selection is done by the `BUPD.R` and BUPD_nonparallel.R` scripts. These s
 
 Model selection via BUPD is done for each study separately, before combining the results into a meta-analysis model that will enable comparable predictions of living shoreline suitability along the entire Florida coastline. The process returns the final selected model (lowest AIC) for each site, as well as the model formula, odds ratios, and beta coefficient estimates, and the run time for the process.
 
-```{r model_selection, eval = FALSE}
+```{r model_selection}
 
 # Retrieve predictor data
 pred <- data$predictors  
@@ -175,17 +179,21 @@ results <- BUPD(data = data, predictors = predictors,
 
 str(results)  # inspect the results
 
+```
+
+```{r BUPD, eval = FALSE}
+
 # Once again, we will save the results as this process can be long
-save(results, file = "data/BUPD_results.rda")  # file path
+save(results, file = "../Data/BUPD_results_subset.rda")  # file path
 
 # Load saved data
 load("data/BUPD_results.rda")  # imports the named "results" object
 
 ```
 
-```{r model_selection2, echo = FALSE, eval = FALSE}
+```{r model_selection2, echo = FALSE}
 
-load("../Data/BUPD_results.rda")
+load("../Data/BUPD_results_subset.rda")
 
 ```
 
