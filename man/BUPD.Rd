@@ -9,7 +9,7 @@ BUPD(data, predictors, parallel = FALSE)
 }
 \arguments{
   \item{data}{Cleaned and standardized output following \code{\link{wranglingCleaning}} and \code{\link{standardize}}. This should be a list of the following items: \code{state}, \code{predictors}, \code{numerical_vars}, \code{categorical_vars}, and \code{binary_vars}.}
-  \item{predictors}{Data frame of numeric and factored predictor variables with values combined across studies. This should follow the same format as the predictors object output from \code{\link{standardize}}. See \code{vignette("Meta-Analysis_Model_Full_Workflow", package = ecoinfoscrg)} and other vignettes for examples.}
+  \item{predictors}{Vector of numeric and factored predictor variables to be used in the meta-analysis model. See \code{vignette(package = ecoinfoscrg)} for examples.}
   \item{parallel}{Logical, if \code{TRUE}, the process is parallelized, which allows faster computation on systems where enabled.}
 }
 \details{

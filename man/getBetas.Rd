@@ -5,10 +5,11 @@
 Retrieves beta coefficient estimates from the selected model of each study (after \code{BUPD} or \code{BUPD_nonparallel}) and produces a table of combined beta estimates for predictors across studies. Coefficient estimates are standardized for comparability between studies. Standard error estimates are combined in the same fashion.
 }
 \usage{
-getBetas(data, Betas)
+getBetas(data, predictors, Betas)
 }
 \arguments{
   \item{data}{Cleaned and standardized output following \code{\link{wranglingCleaning}} and \code{\link{standardize}}. This should be a list of the following items: \code{state}, \code{predictors}, \code{numerical_vars}, \code{categorical_vars}, and \code{binary_vars}.}
+  \item{predictors}{Vector of numeric and factored predictor variables to be used in the meta-analysis model. See \code{vignette(package = ecoinfoscrg)} for examples.}
   \item{Betas}{List of the same length as the number of studies, where each item is the model summary of beta and standard error estimates for selected predictors. These results should be saved upon running model selection for each study. See \code{BUPD} or \code{BUPD_nonparallel} and associated vignettes at \code{vignette(package = "ecoinfoscrg")}.}
 }
 %%\details{

@@ -1,6 +1,6 @@
 # Function for retrieving/cleaning variance-covariance matrices from model selection
 #' @export
-varCov <- function(data, mods, Betas) {
+varCov <- function(data, predictors, mods, Betas) {
 
   # Check if `mods` exists
   if(!exists("mods")) {
@@ -17,14 +17,16 @@ varCov <- function(data, mods, Betas) {
   studies <- unique(data$state$study)
 
   # Get predictors (excluding study and definitions)
-  pred <- pred %>%
-    dplyr::mutate(dplyr::across(c("OBJECTID", "ID", "bmpCountv5", "n", "distance", "X", "Y"), as.character))
-  ## keep non predictor data as characters to avoid being selected as predictors
-  numeric_pred <- pred %>%
-    dplyr::select_if(is.numeric)
-  factor_pred <- pred %>%
-    dplyr::select_if(is.factor)
-  numeric_pred_cols <- colnames(cbind(factor_pred, numeric_pred))
+  numeric_pred_cols <- predictors
+
+  # pred <- pred %>%
+  #   dplyr::mutate(dplyr::across(c("OBJECTID", "ID", "bmpCountv5", "n", "distance", "X", "Y"), as.character))
+  # ## keep non predictor data as characters to avoid being selected as predictors
+  # numeric_pred <- pred %>%
+  #   dplyr::select_if(is.numeric)
+  # factor_pred <- pred %>%
+  #   dplyr::select_if(is.factor)
+  # numeric_pred_cols <- colnames(cbind(factor_pred, numeric_pred))
 
   # Retrieve covariance matrices from each model
   cov_matrix <- list(mods[[1]]$COV,

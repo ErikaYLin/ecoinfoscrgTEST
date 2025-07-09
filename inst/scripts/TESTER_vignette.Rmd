@@ -157,7 +157,7 @@ Model selection is done by the `BUPD.R` and BUPD_nonparallel.R` scripts. These s
 
 Model selection via BUPD is done for each study separately, before combining the results into a meta-analysis model that will enable comparable predictions of living shoreline suitability along the entire Florida coastline. The process returns the final selected model (lowest AIC) for each site, as well as the model formula, odds ratios, and beta coefficient estimates, and the run time for the process.
 
-```{r model_selection}
+```{r model_selection, eval = FALSE}
 
 # Retrieve predictor data
 pred <- data$predictors  
@@ -184,7 +184,7 @@ str(results)  # inspect the results
 ```{r BUPD, eval = FALSE}
 
 # Once again, we will save the results as this process can be long
-save(results, file = "../Data/BUPD_results_subset.rda")  # file path
+save(results, file = "data/BUPD_results_subset.rda")  # file path
 
 # Load saved data
 load("data/BUPD_results.rda")  # imports the named "results" object
@@ -203,7 +203,7 @@ load("../Data/BUPD_results_subset.rda")
 
 The `varCov()` function is used to organize and clean the model results for studies that are to be used in the meta-analysis model. This calls the `getBetas()` function that retrieves the beta coefficient estimates and their standard deviations, combining all the information across studies. `getBetas()` can also be used separately for coefficient retrieval from the ordinal probit regression models, however, we recommend running only `varCov()` to streamline the process.
 
-```{r varCov, eval = FALSE}
+```{r varCov}
 
 # Retrieve selected models and assign to list
 mods <- list(results[[1]]$final_model,  # 1st study (Choctawatchee)

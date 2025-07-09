@@ -1,6 +1,6 @@
 # Function for organizing beta estimates
 #' @export
-getBetas <- function(data, Betas) {
+getBetas <- function(data, predictors, Betas) {
 
   # library(dplyr, quietly = TRUE)
 
@@ -30,14 +30,16 @@ getBetas <- function(data, Betas) {
   }
 
   # Get predictors (excluding study and definitions)
-  pred <- pred %>%
-    dplyr::mutate(dplyr::across(c("OBJECTID", "ID", "bmpCountv5", "n", "distance", "X", "Y"), as.character))
-  ## keep non predictor data as characters to avoid being selected as predictors
-  numeric_pred <- pred %>%
-    dplyr::select_if(is.numeric)
-  factor_pred <- pred %>%
-    dplyr::select_if(is.factor)
-  numeric_pred_cols <- colnames(cbind(factor_pred, numeric_pred))
+  numeric_pred_cols <- predictors
+
+  # pred <- pred %>%
+  #   dplyr::mutate(dplyr::across(c("OBJECTID", "ID", "bmpCountv5", "n", "distance", "X", "Y"), as.character))
+  # ## keep non predictor data as characters to avoid being selected as predictors
+  # numeric_pred <- pred %>%
+  #   dplyr::select_if(is.numeric)
+  # factor_pred <- pred %>%
+  #   dplyr::select_if(is.factor)
+  # numeric_pred_cols <- colnames(cbind(factor_pred, numeric_pred))
 
   # Function to convert model output to dataframe (only keep "Estimate")
   prepare_df <- function(matrix, source, stat = c("beta", "se")) {

@@ -286,6 +286,8 @@ BUPD <- function(data, predictors, parallel = FALSE) {
       ############################################
       # PAIR-DOWN PHASE
       ############################################
+      message("starting pairdown")
+
       current_formula <- best_formula  # start with best FORMULA from build-up phase
       # Iteratively remove predictors
       repeat {
@@ -333,23 +335,38 @@ BUPD <- function(data, predictors, parallel = FALSE) {
       # end_time <- Sys.time()  # for run time of each study
       run_time <- tictoc::toc()  # to track run time per study
 
+      message("done pairdown")
+
       # Save selected model
-      final_model <- ordinal(current_formula, data = input[[s]])
-      RESULTS[[s]]$final_model <- final_model
-      RESULTS[[s]]$final_form <- current_formula  # selected model formula
-      RESULTS[[s]]$odds_ratios <- exp(final_model$est) # Calculate OR
+      final_model <<- ordinal(current_formula, data = input[[s]])
+      vcov.ordinal <- final_model$COV
+      coefs <- matrix(NA, length(final_model$est), 2,
+                      dimnames = list(names(final_model$est),
+                                      c("Estimate", "Std. Error")))
+      coefs[,1] <- final_model$est  # beta estimates
+      coefs[,2] <- sqrt(diag(vcov.ordinal))  # standard error
 
-      # Retrieve beta estimates
-      vcov.ordinal <- final_model$COV  # extract variance-covariance matrix
-      # Build matrix to summarize model coefficients
-      RESULTS[[s]]$coefs <- matrix(NA, length(final_model$est), 2,
-                                   dimnames = list(names(final_model$est),
-                                                   c("Estimate", "Std. Error")))
+      RESULTS[[s]] <- list(final_model = final_model,
+                           final_form = current_formula,
+                           odds_ratios = exp(final_model$est),
+                           coefs = coefs,
+                           run_time = run_time$callback_msg)  # total run time for study
 
-      RESULTS[[s]]$coefs[,1] <- final_model$est  # beta estimates
-      RESULTS[[s]]$coefs[,2] <- sqrt(diag(vcov.ordinal))  # standard error
-      # results[[s]]$run_time <- end_time-start_time  # total run time for study
-      RESULTS[[s]]$run_time <- run_time$callback_msg  # total run time for study
+      # RESULTS[[s]]$final_model <- final_model
+      # RESULTS[[s]]$final_form <- current_formula  # selected model formula
+      # RESULTS[[s]]$odds_ratios <- exp(final_model$est) # Calculate OR
+      #
+      # # Retrieve beta estimates
+      # vcov.ordinal <- final_model$COV  # extract variance-covariance matrix
+      # # Build matrix to summarize model coefficients
+      # RESULTS[[s]]$coefs <- matrix(NA, length(final_model$est), 2,
+      #                              dimnames = list(names(final_model$est),
+      #                                              c("Estimate", "Std. Error")))
+      #
+      # RESULTS[[s]]$coefs[,1] <- final_model$est  # beta estimates
+      # RESULTS[[s]]$coefs[,2] <- sqrt(diag(vcov.ordinal))  # standard error
+      # # results[[s]]$run_time <- end_time-start_time  # total run time for study
+      # RESULTS[[s]]$run_time <- run_time$callback_msg  # total run time for study
 
     }  # end for loop of studies
   }
