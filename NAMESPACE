@@ -1,0 +1,31 @@
+exportPattern("^[[:alpha:]]+")
+
+#IMPORTS
+import(dplyr)
+# import(Matrix)
+import(sf)
+import(stringdist)
+import(ctmm)
+# import(testthat)
+importFrom("metafor", "rma.mv")
+importFrom("stats", "model.matrix", "model.frame", "model.extract", "as.formula",
+           "na.omit", "pnorm", "qnorm", "sd", "update")
+importFrom("sp", "CRS", "SpatialPointsDataFrame")
+importFrom("automap", "autoKrige")
+importFrom("caret", "preProcess")
+importFrom("stringr", "str_c", "str_replace_all", "regex")
+importFrom("parallel", "detectCores", "mclapply")
+importFrom("tictoc", "tic", "toc")
+importFrom("ggplot2", "geom_sf", "aes", "labs", "scale_color_gradient2", "theme",
+           "element_blank")
+
+#DATA CLEANING/HANDLING FUNCTIONS
+export("wranglingCleaning")
+export("standardize")
+
+#META-ANALYTIC REGRESSION FUNCTIONS
+export("BUPD")
+export("getBetas")
+export("varCov")
+export("meta_regression")
+

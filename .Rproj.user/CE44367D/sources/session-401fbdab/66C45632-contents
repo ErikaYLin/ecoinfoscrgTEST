@@ -1,0 +1,31 @@
+Package: ecoinfoscrgTEST
+Type: Package
+Title: TESTER for Living Shoreline Suitability Model for Florida 
+Version: 0.1.0
+Authors@R: c(
+    person("Christen", "Fleming", email = "Christen.Fleming@ucf.edu",
+       role = c("aut", "cph")),
+    person("George", "Zaragosa", email = "George.Zaragosa@ucf.edu",
+       role = c("aut", "cre")),
+    person(c("Thomas","Adriaan"), "Hellinger", email = "Thomas.Hellinger@ucf.edu",
+       role = c("ctb")),
+    person(c("Erika","Yehua"), "Lin", email = "Erika.Lin@ucf.edu",
+       role = c("ctb")),
+    person("Bruno", "Pinheiro", email = "Bruno.Pinheiro@ucf.edu",
+       role = c("ctb")),
+    person("Nozomu", "Hirama", email = "Nozomu.Hirama@ucf.edu",
+       role = c("ctb")))
+Maintainer: UCF Ecoinformatics Lab <George.Zaragosa@ucf.edu>
+URL: 
+Description: Meta-analysis and Living Shoreline Suitability Model for the state of Florida.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: dplyr, metafor, sf, stringdist, stats, ctmm, automap, caret, sp, stringr, 
+    parallel, tictoc, ggplot2
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
