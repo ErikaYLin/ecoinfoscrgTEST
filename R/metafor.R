@@ -62,7 +62,7 @@ meta_regression <- function(data, varCov) {
     return(result)
   }
 
-  unscaled.meta <- meta_regression()
+  unscaled.meta <- meta_model()
 
   return(unscaled.meta)
 
