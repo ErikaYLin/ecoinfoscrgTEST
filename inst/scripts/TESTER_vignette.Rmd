@@ -25,7 +25,7 @@ To work with spatial data for this meta-analysis model, the `sf` and `ecoinfoscr
 # install.packages("dplyr")
 # install.packages("ggplot2")
 # install.packages("devtools")  # if `devtools` was not previously installed
-devtools::install_github("https://github.com/ErikaYLin/ecoinfoscrgTEST/")
+# devtools::install_github("https://github.com/ErikaYLin/ecoinfoscrgTEST/")
 
 # Load ecoinfoscrg
 library(ecoinfoscrgTEST)
