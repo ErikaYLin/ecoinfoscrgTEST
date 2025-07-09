@@ -16,7 +16,7 @@ meta_regression <- function(data, varCov) {
   # Retrieve necessary components
   combined_betas_only <- varCov$combined_betas_only
   VAR <- varCov$VAR
-  studies <- data$state$study
+  studies <- unique(data$state$study)
 
   # Flatten beta coefficients
   betas_vector <- as.vector(t(combined_betas_only))
@@ -44,10 +44,10 @@ meta_regression <- function(data, varCov) {
     struct = "UN",
     verbose = FALSE
   ) {
-    if (is.null(beta)) beta <- get("beta", envir = .GlobalEnv) # default option
-    if (is.null(variance)) variance <- get("variance", envir = .GlobalEnv) # default option
-    if (is.null(predictor)) predictor <- get("predictor", envir = .GlobalEnv) # default option
-    if (is.null(study)) study <- get("study", envir = .GlobalEnv) # default option
+    # if (is.null(beta)) beta <- get("beta", envir = .GlobalEnv) # default option
+    # if (is.null(variance)) variance <- get("variance", envir = .GlobalEnv) # default option
+    # if (is.null(predictor)) predictor <- get("predictor", envir = .GlobalEnv) # default option
+    # if (is.null(study)) study <- get("study", envir = .GlobalEnv) # default option
 
     result <- metafor::rma.mv(
       yi = beta,          # Vector of all beta coefficients
@@ -62,7 +62,10 @@ meta_regression <- function(data, varCov) {
     return(result)
   }
 
-  unscaled.meta <- meta_model()
+  unscaled.meta <- meta_model(beta = beta,
+                              variance = variance,
+                              predictor = predictor,
+                              study = study)
 
   return(unscaled.meta)
 

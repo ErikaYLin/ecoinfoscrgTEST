@@ -232,7 +232,8 @@ The meta-analytic regression model can be updated with new data from Living Shor
 ```{r meta_regression, eval = FALSE}
 
 # Build meta-analysis model
-meta_analysis <- meta_regression(data = data, varCov = VARCOV)
+meta_analysis <- meta_regression(data = data, 
+                                 varCov = VARCOV)
 
 ```
 
