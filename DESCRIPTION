@@ -16,7 +16,7 @@ Authors@R: c(
     person("Nozomu", "Hirama", email = "Nozomu.Hirama@ucf.edu",
        role = c("ctb")))
 Maintainer: UCF Ecoinformatics Lab <George.Zaragosa@ucf.edu>
-URL: 
+URL: https://github.com/ErikaYLin/ecoinfoscrgTEST
 Description: Meta-analysis and Living Shoreline Suitability Model for the state of Florida.
 License: GPL-3
 Encoding: UTF-8
