@@ -187,7 +187,7 @@ str(results)  # inspect the results
 save(results, file = "data/BUPD_results_subset.rda")  # file path
 
 # Load saved data
-load("data/BUPD_results.rda")  # imports the named "results" object
+load("data/BUPD_results_subset.rda")  # imports the named "results" object
 
 ```
 
@@ -218,7 +218,10 @@ Betas <- list(results[[1]]$coefs,  # 1st study (Choctawatchee)
               results[[4]]$coefs)  # 4th study (IRL)
 
 # Retrieve betas and variance-covariance matrices for betas
-VARCOV <- varCov(data = data, mods = mods, Betas = Betas)
+VARCOV <- varCov(data = data, 
+                 predictors = predictors, 
+                 mods = mods, 
+                 Betas = Betas)
 
 ```
 

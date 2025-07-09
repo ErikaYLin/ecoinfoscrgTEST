@@ -39,7 +39,7 @@ varCov <- function(data, predictors, mods, Betas) {
   # source("R/getBetas.R")
 
   # Retrieve and combine betas (using getBetas.R)
-  GB <- getBetas(data, Betas)
+  GB <- getBetas(data = data, predictors = predictors, Betas = Betas)
 
   # Re-assign outputs for easy access
   combined_betas <- GB$combined_betas
@@ -47,15 +47,15 @@ varCov <- function(data, predictors, mods, Betas) {
   combined_se <- GB$combined_se
   combined_se_only <- GB$combined_se_only
 
-  for (i in 1:length(cov_matrix)) {
-
-    # # Symmetrization of matrices
-    # cov_matrix[[i]] <- (cov_matrix[[i]] + t(cov_matrix[[i]]))/2
-
-    # Remove intercepts
-    cov_matrix[[i]] <- cov_matrix[[i]][2:(dim(cov_matrix[[i]])[[1]]),
-                                       2:(dim(cov_matrix[[i]])[[2]])]
-  }
+  # for (i in 1:length(cov_matrix)) {
+  #
+  #   # # Symmetrization of matrices
+  #   # cov_matrix[[i]] <- (cov_matrix[[i]] + t(cov_matrix[[i]]))/2
+  #
+  #   # Remove intercepts
+  #   cov_matrix[[i]] <- cov_matrix[[i]][2:(dim(cov_matrix[[i]])[[1]]),
+  #                                      2:(dim(cov_matrix[[i]])[[2]])]
+  # }
 
   # Find where there are missing values
   missing_values <- list()
@@ -70,6 +70,9 @@ varCov <- function(data, predictors, mods, Betas) {
     cov_matrix[[i]] <- rbind(cov_matrix[[i]], missing_row)
     dimnames(cov_matrix[[i]]) <- list(c(selected[[1]], missing_preds),
                                       c(selected[[1]], missing_preds))
+
+    cov_matrix[[i]] <- cov_matrix[[i]][2:(dim(cov_matrix[[i]])[[1]]),
+                                       2:(dim(cov_matrix[[i]])[[2]])]
 
     # Predictors with missing values
     missing_values[[i]] <- is.na(cov_matrix[[i]])
